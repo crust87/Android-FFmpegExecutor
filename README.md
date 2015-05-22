@@ -18,7 +18,7 @@ mExecuter.setOnReadProcessLineListener(new FFmpegExecuter.OnReadProcessLineListe
 });
 ```
 
-you must call init() before put command
+you must call init() before put command<br/>
 put some commands
 ```java
 mExecuter.init();
