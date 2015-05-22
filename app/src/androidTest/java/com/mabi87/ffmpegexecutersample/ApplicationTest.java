@@ -1,4 +1,4 @@
-package com.mabi87.ffmpegexecuter;
+package com.mabi87.ffmpegexecutersample;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

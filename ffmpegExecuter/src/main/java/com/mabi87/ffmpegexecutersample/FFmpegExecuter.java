@@ -19,7 +19,7 @@
  * limitations under the License.
  */
 
-package com.mabi87.ffmpegexecuter;
+package com.mabi87.ffmpegexecutersample;
 
 import android.content.Context;
 import android.util.Log;
@@ -85,6 +85,7 @@ public class FFmpegExecuter {
     // Initialization
     public void init() {
         mCommands.clear();
+        mCommands.add(mContext.getFilesDir().toString() + "/" + FFMPEG_PATH + "/ffmpeg");
     }
 
     public void putCommand(String command) {
@@ -94,6 +95,9 @@ public class FFmpegExecuter {
     public void executeCommand() throws IOException {
         Process process = new ProcessBuilder(mCommands).redirectErrorStream(true).start();
         ffmpegLog(process);
+        if(process != null) {
+            process.destroy();
+        }
     }
 
     public void ffmpegLog(Process process) throws IOException {
