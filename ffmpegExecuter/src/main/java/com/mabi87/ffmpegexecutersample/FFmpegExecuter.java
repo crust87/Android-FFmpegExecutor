@@ -1,6 +1,6 @@
 /*
  * HttpRequestBuilder
- * https://github.com/mabi87/Android-FFmpegCommandExecuter
+ * https://github.com/mabi87/Android-FFmpegExecuter
  *
  * Mabi
  * crust87@gmail.com
