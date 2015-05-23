@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -88,6 +89,7 @@ public class CropVideoView extends TextureView implements MediaPlayerControl {
 	private int viewHeight;
 	private Matrix matrix;
 	private float scale;
+	private int mRotate;
 
 	// Working Variables
 	float pastX; // touche event past position x, y and move point
@@ -213,6 +215,25 @@ public class CropVideoView extends TextureView implements MediaPlayerControl {
 	public void setVideoURI(Uri pVideoURI) {
 		uri = pVideoURI;
 		mSeekWhenPrepared = 0;
+
+		MediaMetadataRetriever retriever = new  MediaMetadataRetriever();
+		retriever.setDataSource(mContext, pVideoURI);
+
+		// create thumbnail bitmap
+		if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+			String rotation = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
+
+			try {
+				mRotate = Integer.parseInt(rotation);
+			} catch(NumberFormatException e) {
+				mRotate = 0;
+			}
+		}
+
+		retriever.release();
+
+
+
 		openVideo();
 		requestLayout();
 		invalidate();
@@ -628,6 +649,10 @@ public class CropVideoView extends TextureView implements MediaPlayerControl {
 
 	public int getVideoHeight() {
 		return mVideoHeight;
+	}
+
+	public int getRotate() {
+		return mRotate;
 	}
 	
 	public void setOnTranslatePositionListener(OnTranslatePositionListener pOnTranslatePositionListener) {

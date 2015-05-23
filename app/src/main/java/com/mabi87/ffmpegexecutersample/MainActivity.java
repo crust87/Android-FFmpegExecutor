@@ -23,7 +23,6 @@ package com.mabi87.ffmpegexecutersample;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -45,8 +44,6 @@ public class MainActivity extends ActionBarActivity {
 
     // Attributes
     private String originalPath;
-    private int mRotate;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,14 +92,15 @@ public class MainActivity extends ActionBarActivity {
             int lPositionY = (int) mCropVideoView.getRealPositionY();
             int lVideoWidth = mCropVideoView.getVideoWidth();
             int lVideoHeight = mCropVideoView.getVideoHeight();
+            int lRotate = mCropVideoView.getRotate();
 
-            if(mRotate == 0) {
+            if(lRotate == 0) {
                 filter = "crop="+lWidth+":"+lHeight+":"+lPositionX+":"+lPositionY+", scale=480:640, setsar=1:1";
-            } else if(mRotate == 90) {
+            } else if(lRotate == 90) {
                 filter = "crop="+lHeight+":"+lWidth+":"+lPositionY+":"+lPositionX +", scale=640:480, setsar=1:1";
-            } else if(mRotate == 180) {
+            } else if(lRotate == 180) {
                 filter = "crop="+lWidth+":"+lHeight+":"+(lVideoWidth - lPositionX - lWidth)+":"+lPositionY+ ", scale=480:640, setsar=1:1";
-            } else if(mRotate == 270) {
+            } else if(lRotate == 270) {
                 filter = "crop="+lHeight+":"+lWidth+":"+(lVideoHeight - lPositionY - lHeight)+":"+lPositionX + ", scale=640:480, setsar=1:1";
             } else {
                 filter = "crop="+lWidth+":"+lHeight+":"+lPositionX+":"+lPositionY+", scale=480:640, setsar=1:1";
@@ -137,22 +135,6 @@ public class MainActivity extends ActionBarActivity {
 
         mCropVideoView.setVideoURI(uri);
         mCropVideoView.seekTo(1);
-
-        MediaMetadataRetriever retriever = new  MediaMetadataRetriever();
-        retriever.setDataSource(originalPath);
-
-        // create thumbnail bitmap
-        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            String rotation = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
-
-            try {
-                mRotate = Integer.parseInt(rotation);
-            } catch(NumberFormatException e) {
-                mRotate = 0;
-            }
-        }
-
-        retriever.release();
     }
 
     public String getRealPathFromURI(Uri contentUri) {
