@@ -4,7 +4,7 @@
  *
  * Mabi
  * crust87@gmail.com
- * last modify 2015-05-22
+ * last modify 2015-05-23
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,8 +43,13 @@ public class FFmpegExecuter {
     private ArrayList<String> mCommands;
     private OnReadProcessLineListener mOnReadProcessLineListener;
 
-    // Constructor
-    // copy ffmpeg to internal storage and change file permission
+    /**
+     * Constructor
+     * Copy ffmpeg to internal storage and change file permission
+     *
+     * @param context
+     * 				the context of application
+     */
     public FFmpegExecuter(Context context) {
         mContext = context;
         mCommands = new ArrayList<String>();
@@ -82,16 +87,26 @@ public class FFmpegExecuter {
         }
     }
 
-    // Initialization
+    /**
+     * Initialization
+     */
     public void init() {
         mCommands.clear();
         mCommands.add(mContext.getFilesDir().toString() + "/" + FFMPEG_PATH + "/ffmpeg");
     }
 
+    /**
+     * @param command
+     * 				the string command for FFmpeg
+     */
     public void putCommand(String command) {
         mCommands.add(command);
     }
 
+    /**
+     * @throws IOException
+     * 				if Process can not start
+     */
     public void executeCommand() throws IOException {
         Process process = new ProcessBuilder(mCommands).redirectErrorStream(true).start();
         ffmpegLog(process);
@@ -100,6 +115,10 @@ public class FFmpegExecuter {
         }
     }
 
+    /**
+     * @throws IOException
+     * 				if BufferedReader can not read line
+     */
     public void ffmpegLog(Process process) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
@@ -112,6 +131,11 @@ public class FFmpegExecuter {
         }
     }
 
+    /**
+     * @param pOnReadProcessLineListener
+     * 				the OnReadProcessLineListener for ffmpegLog()
+     * 			    if you set this interface, ffmpegLog method will use it when read each line
+     */
     public void setOnReadProcessLineListener(OnReadProcessLineListener pOnReadProcessLineListener) {
         mOnReadProcessLineListener = pOnReadProcessLineListener;
     }
