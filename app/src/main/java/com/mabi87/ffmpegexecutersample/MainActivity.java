@@ -21,12 +21,16 @@
 
 package com.mabi87.ffmpegexecutersample;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
@@ -38,6 +42,7 @@ public class MainActivity extends ActionBarActivity {
 
     // Layout Components
     private CropVideoView mCropVideoView;
+    private ProgressDialog mProgressDialog;
 
     // Component
     private FFmpegExecuter mExecuter;
@@ -59,7 +64,29 @@ public class MainActivity extends ActionBarActivity {
                 mCropVideoView.start();
             }
         });
+
+        mExecuter.setOnReadProcessLineListener(new FFmpegExecuter.OnReadProcessLineListener() {
+            @Override
+            public void onReadProcessLine(String line) {
+                Message msg = Message.obtain();
+                msg.obj = line;
+                msg.setTarget(mMessageHandler);
+                msg.sendToTarget();
+            }
+        });
     }
+
+    private Handler mMessageHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            String message = (String) msg.obj;
+            if(mProgressDialog != null) {
+                mProgressDialog.setMessage(message);
+            }
+        }
+    };
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -78,55 +105,73 @@ public class MainActivity extends ActionBarActivity {
     public void onButtonCropClick(View v) {
         mCropVideoView.pause();
 
-        mExecuter.init();
+        new AsyncTask<Void, Void, Void>() {
 
-        try {
-            String filter = "";
-
-            float lScale = mCropVideoView.getScale();
-            int lViewWidth = mCropVideoView.getWidth();
-            int lViewHeight = mCropVideoView.getHeight();
-            int lWidth = (int)(lViewWidth * lScale);
-            int lHeight = (int)(lViewHeight * lScale);
-            int lPositionX = (int) mCropVideoView.getRealPositionX();
-            int lPositionY = (int) mCropVideoView.getRealPositionY();
-            int lVideoWidth = mCropVideoView.getVideoWidth();
-            int lVideoHeight = mCropVideoView.getVideoHeight();
-            int lRotate = mCropVideoView.getRotate();
-
-            if(lRotate == 0) {
-                filter = "crop="+lWidth+":"+lHeight+":"+lPositionX+":"+lPositionY+", scale=480:640, setsar=1:1";
-            } else if(lRotate == 90) {
-                filter = "crop="+lHeight+":"+lWidth+":"+lPositionY+":"+lPositionX +", scale=640:480, setsar=1:1";
-            } else if(lRotate == 180) {
-                filter = "crop="+lWidth+":"+lHeight+":"+(lVideoWidth - lPositionX - lWidth)+":"+lPositionY+ ", scale=480:640, setsar=1:1";
-            } else if(lRotate == 270) {
-                filter = "crop="+lHeight+":"+lWidth+":"+(lVideoHeight - lPositionY - lHeight)+":"+lPositionX + ", scale=640:480, setsar=1:1";
-            } else {
-                filter = "crop="+lWidth+":"+lHeight+":"+lPositionX+":"+lPositionY+", scale=480:640, setsar=1:1";
+            @Override
+            protected void onPreExecute() {
+                mExecuter.init();
+                mProgressDialog = ProgressDialog.show(MainActivity.this, null, "execute....", true);
             }
 
-            mExecuter.putCommand("-y");
-            mExecuter.putCommand("-i");
-            mExecuter.putCommand(originalPath);
-            mExecuter.putCommand("-vcodec");
-            mExecuter.putCommand("libx264");
-            mExecuter.putCommand("-profile:v");
-            mExecuter.putCommand("baseline");
-            mExecuter.putCommand("-level");
-            mExecuter.putCommand("3.1");
-            mExecuter.putCommand("-b:v");
-            mExecuter.putCommand("1000k");
-            mExecuter.putCommand("-vf");
-            mExecuter.putCommand(filter);
-            mExecuter.putCommand("-c:a");
-            mExecuter.putCommand("copy");
-            mExecuter.putCommand(Environment.getExternalStorageDirectory().getAbsolutePath() + "/result.mp4");
-            mExecuter.executeCommand();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    String filter = "";
 
+                    float lScale = mCropVideoView.getScale();
+                    int lViewWidth = mCropVideoView.getWidth();
+                    int lViewHeight = mCropVideoView.getHeight();
+                    int lWidth = (int)(lViewWidth * lScale);
+                    int lHeight = (int)(lViewHeight * lScale);
+                    int lPositionX = (int) mCropVideoView.getRealPositionX();
+                    int lPositionY = (int) mCropVideoView.getRealPositionY();
+                    int lVideoWidth = mCropVideoView.getVideoWidth();
+                    int lVideoHeight = mCropVideoView.getVideoHeight();
+                    int lRotate = mCropVideoView.getRotate();
+
+                    if(lRotate == 0) {
+                        filter = "crop="+lWidth+":"+lHeight+":"+lPositionX+":"+lPositionY+", scale=480:640, setsar=1:1";
+                    } else if(lRotate == 90) {
+                        filter = "crop="+lHeight+":"+lWidth+":"+lPositionY+":"+lPositionX +", scale=640:480, setsar=1:1";
+                    } else if(lRotate == 180) {
+                        filter = "crop="+lWidth+":"+lHeight+":"+(lVideoWidth - lPositionX - lWidth)+":"+lPositionY+ ", scale=480:640, setsar=1:1";
+                    } else if(lRotate == 270) {
+                        filter = "crop="+lHeight+":"+lWidth+":"+(lVideoHeight - lPositionY - lHeight)+":"+lPositionX + ", scale=640:480, setsar=1:1";
+                    } else {
+                        filter = "crop="+lWidth+":"+lHeight+":"+lPositionX+":"+lPositionY+", scale=480:640, setsar=1:1";
+                    }
+
+                    mExecuter.putCommand("-y");
+                    mExecuter.putCommand("-i");
+                    mExecuter.putCommand(originalPath);
+                    mExecuter.putCommand("-vcodec");
+                    mExecuter.putCommand("libx264");
+                    mExecuter.putCommand("-profile:v");
+                    mExecuter.putCommand("baseline");
+                    mExecuter.putCommand("-level");
+                    mExecuter.putCommand("3.1");
+                    mExecuter.putCommand("-b:v");
+                    mExecuter.putCommand("1000k");
+                    mExecuter.putCommand("-vf");
+                    mExecuter.putCommand(filter);
+                    mExecuter.putCommand("-c:a");
+                    mExecuter.putCommand("copy");
+                    mExecuter.putCommand(Environment.getExternalStorageDirectory().getAbsolutePath() + "/result.mp4");
+                    mExecuter.executeCommand();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                mProgressDialog.dismiss();
+                mProgressDialog = null;
+            }
+
+        }.execute();
     }
 
     // Initialization original video
@@ -142,8 +187,7 @@ public class MainActivity extends ActionBarActivity {
         try {
             String[] proj = { MediaStore.Images.Media.DATA };
             cursor = getApplicationContext().getContentResolver().query(contentUri, proj, null, null, null);
-            int column_index = cursor
-                    .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             cursor.moveToFirst();
             return cursor.getString(column_index);
         } finally {
