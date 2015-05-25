@@ -19,7 +19,7 @@
  * limitations under the License.
  */
 
-package com.mabi87.ffmpegexecutersample;
+package com.mabi87.videocropview;
 
 import android.content.Context;
 import android.content.Intent;
@@ -48,7 +48,7 @@ import android.widget.VideoView;
 
 import java.io.IOException;
 
-public class CropVideoView extends TextureView implements MediaPlayerControl {
+public class VideoCropView extends TextureView implements MediaPlayerControl {
 	private static final String LOG_TAG = "CropVideoView";
 
 	private static final int STATE_ERROR = -1;
@@ -98,19 +98,19 @@ public class CropVideoView extends TextureView implements MediaPlayerControl {
 	
 	private OnTranslatePositionListener mOnTranslatePositionListener;
 
-	public CropVideoView(final Context context) {
+	public VideoCropView(final Context context) {
 		super(context);
 		mContext = context;
 		initVideoView();
 	}
 
-	public CropVideoView(final Context context, final AttributeSet attrs) {
+	public VideoCropView(final Context context, final AttributeSet attrs) {
 		super(context, attrs);
 		mContext = context;
 		initVideoView();
 	}
 
-	public CropVideoView(Context context, AttributeSet attrs, int defStyle) {
+	public VideoCropView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		mContext = context;
 		initVideoView();

@@ -35,13 +35,15 @@ import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 
+import com.mabi87.videocropview.VideoCropView;
+
 import java.io.IOException;
 
 
 public class MainActivity extends ActionBarActivity {
 
     // Layout Components
-    private CropVideoView mCropVideoView;
+    private VideoCropView mVideoCropView;
     private ProgressDialog mProgressDialog;
 
     // Component
@@ -56,22 +58,22 @@ public class MainActivity extends ActionBarActivity {
 
         mExecuter = new FFmpegExecuter(getApplicationContext());
 
-        mCropVideoView = (CropVideoView) findViewById(R.id.cropVideoView);
-        mCropVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+        mVideoCropView = (VideoCropView) findViewById(R.id.cropVideoView);
+        mVideoCropView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
             @Override
             public void onPrepared(MediaPlayer mp) {
-                mCropVideoView.start();
+                mVideoCropView.start();
             }
         });
 
         mExecuter.setOnReadProcessLineListener(new FFmpegExecuter.OnReadProcessLineListener() {
             @Override
             public void onReadProcessLine(String line) {
-                Message msg = Message.obtain();
-                msg.obj = line;
-                msg.setTarget(mMessageHandler);
-                msg.sendToTarget();
+                Message message = Message.obtain();
+                message.obj = line;
+                message.setTarget(mMessageHandler);
+                message.sendToTarget();
             }
         });
     }
@@ -103,7 +105,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void onButtonCropClick(View v) {
-        mCropVideoView.pause();
+        mVideoCropView.pause();
 
         new AsyncTask<Void, Void, Void>() {
 
@@ -118,16 +120,16 @@ public class MainActivity extends ActionBarActivity {
                 try {
                     String filter = "";
 
-                    float lScale = mCropVideoView.getScale();
-                    int lViewWidth = mCropVideoView.getWidth();
-                    int lViewHeight = mCropVideoView.getHeight();
+                    float lScale = mVideoCropView.getScale();
+                    int lViewWidth = mVideoCropView.getWidth();
+                    int lViewHeight = mVideoCropView.getHeight();
                     int lWidth = (int)(lViewWidth * lScale);
                     int lHeight = (int)(lViewHeight * lScale);
-                    int lPositionX = (int) mCropVideoView.getRealPositionX();
-                    int lPositionY = (int) mCropVideoView.getRealPositionY();
-                    int lVideoWidth = mCropVideoView.getVideoWidth();
-                    int lVideoHeight = mCropVideoView.getVideoHeight();
-                    int lRotate = mCropVideoView.getRotate();
+                    int lPositionX = (int) mVideoCropView.getRealPositionX();
+                    int lPositionY = (int) mVideoCropView.getRealPositionY();
+                    int lVideoWidth = mVideoCropView.getVideoWidth();
+                    int lVideoHeight = mVideoCropView.getVideoHeight();
+                    int lRotate = mVideoCropView.getRotate();
 
                     if(lRotate == 0) {
                         filter = "crop="+lWidth+":"+lHeight+":"+lPositionX+":"+lPositionY+", scale=480:640, setsar=1:1";
@@ -178,8 +180,8 @@ public class MainActivity extends ActionBarActivity {
     private void setOriginalVideo(Uri uri) {
         originalPath = getRealPathFromURI(uri);
 
-        mCropVideoView.setVideoURI(uri);
-        mCropVideoView.seekTo(1);
+        mVideoCropView.setVideoURI(uri);
+        mVideoCropView.seekTo(1);
     }
 
     public String getRealPathFromURI(Uri contentUri) {

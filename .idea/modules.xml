@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/Android-FFmpegExecuter.iml" filepath="$PROJECT_DIR$/Android-FFmpegExecuter.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/ffmpegExecuter/ffmpegExecuter.iml" filepath="$PROJECT_DIR$/ffmpegExecuter/ffmpegExecuter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/videoCropView/videoCropView.iml" filepath="$PROJECT_DIR$/videoCropView/videoCropView.iml" />
     </modules>
   </component>
 </project>

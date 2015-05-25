@@ -42,6 +42,7 @@ public class FFmpegExecuter {
     private Context mContext;
     private ArrayList<String> mCommands;
     private OnReadProcessLineListener mOnReadProcessLineListener;
+    private Process mCurrentProcess;
 
     /**
      * Constructor
@@ -71,11 +72,9 @@ public class FFmpegExecuter {
             }
         }
 
-        Process process = null;
-
         try {
             String[] args = { "/system/bin/chmod", "755", ffmpegPath.getAbsolutePath() + "/ffmpeg" };
-            process = new ProcessBuilder(args).start();
+            Process process = new ProcessBuilder(args).start();
             try {
                 process.waitFor();
             } catch (InterruptedException e) {
@@ -108,19 +107,9 @@ public class FFmpegExecuter {
      * 				if Process can not start
      */
     public void executeCommand() throws IOException {
-        Process process = new ProcessBuilder(mCommands).redirectErrorStream(true).start();
-        ffmpegLog(process);
-        if(process != null) {
-            process.destroy();
-        }
-    }
+        mCurrentProcess = new ProcessBuilder(mCommands).redirectErrorStream(true).start();
 
-    /**
-     * @throws IOException
-     * 				if BufferedReader can not read line
-     */
-    public void ffmpegLog(Process process) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(mCurrentProcess.getInputStream()));
         String line;
         while ((line = reader.readLine()) != null)  {
             if(mOnReadProcessLineListener != null) {
@@ -128,6 +117,18 @@ public class FFmpegExecuter {
             } else {
                 Log.v("FFmpegExecuter", line);
             }
+        }
+
+        destroy();
+    }
+
+    /*
+     * I'm not sure it's work
+     */
+    public void destroy() {
+        if(mCurrentProcess != null) {
+            mCurrentProcess.destroy();
+            mCurrentProcess = null;
         }
     }
 
