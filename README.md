@@ -22,22 +22,23 @@ you must call init() before put command<br/>
 put some commands
 ```java
 mExecuter.init();
-mExecuter.putCommand("-y");
-mExecuter.putCommand("-i");
-mExecuter.putCommand(originalPath);
-mExecuter.putCommand("-vcodec");
-mExecuter.putCommand("libx264");
-mExecuter.putCommand("-profile:v");
-mExecuter.putCommand("baseline");
-mExecuter.putCommand("-level");
-mExecuter.putCommand("3.1");
-mExecuter.putCommand("-b:v");
-mExecuter.putCommand("1000k");
-mExecuter.putCommand("-vf");
-mExecuter.putCommand(filter);
-mExecuter.putCommand("-c:a");
-mExecuter.putCommand("copy");
-mExecuter.putCommand(Environment.getExternalStorageDirectory().getAbsolutePath() + "/result.mp4");
+
+mExecuter.putCommand("-y")
+    .putCommand("-i")
+    .putCommand(originalPath)
+    .putCommand("-vcodec")
+    .putCommand("libx264")
+    .putCommand("-profile:v")
+    .putCommand("baseline")
+    .putCommand("-level")
+    .putCommand("3.1")
+    .putCommand("-b:v")
+    .putCommand("1000k")
+    .putCommand("-vf")
+    .putCommand(filter)
+    .putCommand("-c:a")
+    .putCommand("copy")
+    .putCommand(Environment.getExternalStorageDirectory().getAbsolutePath() + "/result.mp4");
 ```
 
 and execute command

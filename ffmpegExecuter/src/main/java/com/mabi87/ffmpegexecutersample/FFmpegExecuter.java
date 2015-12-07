@@ -97,9 +97,12 @@ public class FFmpegExecuter {
     /**
      * @param command
      * 				the string command for FFmpeg
+     * @return this
      */
-    public void putCommand(String command) {
+    public FFmpegExecuter putCommand(String command) {
         mCommands.add(command);
+
+        return this;
     }
 
     /**

@@ -109,10 +109,32 @@ public class MainActivity extends ActionBarActivity {
 
         new AsyncTask<Void, Void, Void>() {
 
+            float scale;
+            int viewWidth;
+            int viewHeight;
+            int width;
+            int height;
+            int positionX;
+            int positionY;
+            int videoWidth;
+            int videoHeight;
+            int rotate;
+
             @Override
             protected void onPreExecute() {
                 mExecuter.init();
                 mProgressDialog = ProgressDialog.show(MainActivity.this, null, "execute....", true);
+
+                scale = mVideoCropView.getScale();
+                viewWidth = mVideoCropView.getWidth();
+                viewHeight = mVideoCropView.getHeight();
+                width = (int)(viewWidth * scale);
+                height = (int)(viewHeight * scale);
+                positionX = (int) mVideoCropView.getRealPositionX();
+                positionY = (int) mVideoCropView.getRealPositionY();
+                videoWidth = mVideoCropView.getVideoWidth();
+                videoHeight = mVideoCropView.getVideoHeight();
+                rotate = mVideoCropView.getRotate();
             }
 
             @Override
@@ -120,46 +142,37 @@ public class MainActivity extends ActionBarActivity {
                 try {
                     String filter = "";
 
-                    float lScale = mVideoCropView.getScale();
-                    int lViewWidth = mVideoCropView.getWidth();
-                    int lViewHeight = mVideoCropView.getHeight();
-                    int lWidth = (int)(lViewWidth * lScale);
-                    int lHeight = (int)(lViewHeight * lScale);
-                    int lPositionX = (int) mVideoCropView.getRealPositionX();
-                    int lPositionY = (int) mVideoCropView.getRealPositionY();
-                    int lVideoWidth = mVideoCropView.getVideoWidth();
-                    int lVideoHeight = mVideoCropView.getVideoHeight();
-                    int lRotate = mVideoCropView.getRotate();
 
-                    if(lRotate == 0) {
-                        filter = "crop="+lWidth+":"+lHeight+":"+lPositionX+":"+lPositionY+", scale=480:640, setsar=1:1";
-                    } else if(lRotate == 90) {
-                        filter = "crop="+lHeight+":"+lWidth+":"+lPositionY+":"+lPositionX +", scale=640:480, setsar=1:1";
-                    } else if(lRotate == 180) {
-                        filter = "crop="+lWidth+":"+lHeight+":"+(lVideoWidth - lPositionX - lWidth)+":"+lPositionY+ ", scale=480:640, setsar=1:1";
-                    } else if(lRotate == 270) {
-                        filter = "crop="+lHeight+":"+lWidth+":"+(lVideoHeight - lPositionY - lHeight)+":"+lPositionX + ", scale=640:480, setsar=1:1";
+
+                    if(rotate == 0) {
+                        filter = "crop="+width+":"+height+":"+positionX+":"+positionY+", scale=480:640, setsar=1:1";
+                    } else if(rotate == 90) {
+                        filter = "crop="+height+":"+width+":"+positionY+":"+positionX +", scale=640:480, setsar=1:1";
+                    } else if(rotate == 180) {
+                        filter = "crop="+width+":"+height+":"+(videoWidth - positionX - width)+":"+positionY+ ", scale=480:640, setsar=1:1";
+                    } else if(rotate == 270) {
+                        filter = "crop="+height+":"+width+":"+(videoHeight - positionY - height)+":"+positionX + ", scale=640:480, setsar=1:1";
                     } else {
-                        filter = "crop="+lWidth+":"+lHeight+":"+lPositionX+":"+lPositionY+", scale=480:640, setsar=1:1";
+                        filter = "crop="+width+":"+height+":"+positionX+":"+positionY+", scale=480:640, setsar=1:1";
                     }
 
-                    mExecuter.putCommand("-y");
-                    mExecuter.putCommand("-i");
-                    mExecuter.putCommand(originalPath);
-                    mExecuter.putCommand("-vcodec");
-                    mExecuter.putCommand("libx264");
-                    mExecuter.putCommand("-profile:v");
-                    mExecuter.putCommand("baseline");
-                    mExecuter.putCommand("-level");
-                    mExecuter.putCommand("3.1");
-                    mExecuter.putCommand("-b:v");
-                    mExecuter.putCommand("1000k");
-                    mExecuter.putCommand("-vf");
-                    mExecuter.putCommand(filter);
-                    mExecuter.putCommand("-c:a");
-                    mExecuter.putCommand("copy");
-                    mExecuter.putCommand(Environment.getExternalStorageDirectory().getAbsolutePath() + "/result.mp4");
-                    mExecuter.executeCommand();
+                    mExecuter.putCommand("-y")
+                        .putCommand("-i")
+                        .putCommand(originalPath)
+                        .putCommand("-vcodec")
+                        .putCommand("libx264")
+                        .putCommand("-profile:v")
+                        .putCommand("baseline")
+                        .putCommand("-level")
+                        .putCommand("3.1")
+                        .putCommand("-b:v")
+                        .putCommand("1000k")
+                        .putCommand("-vf")
+                        .putCommand(filter)
+                        .putCommand("-c:a")
+                        .putCommand("copy")
+                        .putCommand(Environment.getExternalStorageDirectory().getAbsolutePath() + "/result.mp4")
+                        .executeCommand();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
