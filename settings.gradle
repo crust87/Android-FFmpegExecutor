@@ -1,1 +1,1 @@
-include ':app', ':ffmpegExecuter', ':videoCropView'
+include ':app', ':ffmpegExecuter'

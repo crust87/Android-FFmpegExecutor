@@ -37,10 +37,18 @@ import android.view.View;
 
 import com.mabi87.videocropview.VideoCropView;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    // Constants
+    private final static String FFMPEG_PATH = "ffmpeg";
 
     // Layout Components
     private VideoCropView mVideoCropView;
@@ -56,7 +64,37 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mExecuter = new FFmpegExecuter(getApplicationContext());
+        String[] libraryAssets = { "ffmpeg" };
+
+        File ffmpegDirPath = new File(getApplicationContext().getFilesDir().getAbsolutePath() + "/" + FFMPEG_PATH);
+        if(!ffmpegDirPath.exists()) {
+            ffmpegDirPath.mkdir();
+        }
+
+        for (int i = 0; i < libraryAssets.length; i++) {
+            try {
+                InputStream ffmpegInputStream = getApplicationContext().getAssets().open(libraryAssets[i]);
+                FileMover fm = new FileMover(ffmpegInputStream, ffmpegDirPath.getAbsolutePath() + "/" + libraryAssets[i]);
+                fm.moveIt();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            String[] args = { "/system/bin/chmod", "755", ffmpegDirPath.getAbsolutePath() + "/ffmpeg" };
+            Process process = new ProcessBuilder(args).start();
+            try {
+                process.waitFor();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            process.destroy();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        mExecuter = new FFmpegExecuter(getApplicationContext(), ffmpegDirPath.getAbsolutePath() + "/ffmpeg");
 
         mVideoCropView = (VideoCropView) findViewById(R.id.cropVideoView);
         mVideoCropView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -142,18 +180,16 @@ public class MainActivity extends ActionBarActivity {
                 try {
                     String filter = "";
 
-
-
                     if(rotate == 0) {
-                        filter = "crop="+width+":"+height+":"+positionX+":"+positionY+", scale=480:640, setsar=1:1";
+                        filter = "crop="+width+":"+height+":"+positionX+":"+positionY+", scale=640:640, setsar=1:1";
                     } else if(rotate == 90) {
-                        filter = "crop="+height+":"+width+":"+positionY+":"+positionX +", scale=640:480, setsar=1:1";
+                        filter = "crop="+height+":"+width+":"+positionY+":"+positionX +", scale=640:640, setsar=1:1";
                     } else if(rotate == 180) {
-                        filter = "crop="+width+":"+height+":"+(videoWidth - positionX - width)+":"+positionY+ ", scale=480:640, setsar=1:1";
+                        filter = "crop="+width+":"+height+":"+(videoWidth - positionX - width)+":"+positionY+ ", scale=640:640, setsar=1:1";
                     } else if(rotate == 270) {
-                        filter = "crop="+height+":"+width+":"+(videoHeight - positionY - height)+":"+positionX + ", scale=640:480, setsar=1:1";
+                        filter = "crop="+height+":"+width+":"+(videoHeight - positionY - height)+":"+positionX + ", scale=640:640, setsar=1:1";
                     } else {
-                        filter = "crop="+width+":"+height+":"+positionX+":"+positionY+", scale=480:640, setsar=1:1";
+                        filter = "crop="+width+":"+height+":"+positionX+":"+positionY+", scale=640:640, setsar=1:1";
                     }
 
                     mExecuter.putCommand("-y")
@@ -212,4 +248,30 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    // Copy file
+    private class FileMover {
+
+        private InputStream mInputStream;
+        private String mDestination;
+
+        public FileMover(InputStream inputStream, String destination) {
+            mInputStream = inputStream;
+            mDestination = destination;
+        }
+
+        public void moveIt() throws IOException {
+
+            File destinationFile = new File(mDestination);
+            OutputStream destinationOut = new BufferedOutputStream(new FileOutputStream(destinationFile));
+
+            int numRead;
+            byte[] buf = new byte[1024];
+            while ((numRead = mInputStream.read(buf) ) >= 0) {
+                destinationOut.write(buf, 0, numRead);
+            }
+
+            destinationOut.flush();
+            destinationOut.close();
+        }
+    }
 }

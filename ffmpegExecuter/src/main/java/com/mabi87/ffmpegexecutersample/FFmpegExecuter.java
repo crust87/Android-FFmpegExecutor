@@ -35,8 +35,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 public class FFmpegExecuter {
-    // Constants
-    private final static String FFMPEG_PATH = "ffmpeg";
 
     // Components
     private Context mContext;
@@ -44,46 +42,23 @@ public class FFmpegExecuter {
     private OnReadProcessLineListener mOnReadProcessLineListener;
     private Process mCurrentProcess;
 
+    // Attributes
+    private String mFFmpegPath;
+
     /**
      * Constructor
      * Copy ffmpeg to internal storage and change file permission
      *
      * @param context
      * 				the context of application
+     * @param ffmpegPath
+     *              the String of ffmpegPath, this path must be internal storage
      */
-    public FFmpegExecuter(Context context) {
+    public FFmpegExecuter(Context context, String ffmpegPath) {
         mContext = context;
-        mCommands = new ArrayList<String>();
+        mCommands = new ArrayList<>();
 
-        String[] libraryAssets = { "ffmpeg" };
-
-        File ffmpegPath = new File(mContext.getFilesDir().getAbsolutePath() + "/" + FFMPEG_PATH);
-        if(!ffmpegPath.exists()) {
-            ffmpegPath.mkdir();
-        }
-
-        for (int i = 0; i < libraryAssets.length; i++) {
-            try {
-                InputStream ffmpegInputStream = mContext.getAssets().open(libraryAssets[i]);
-                FileMover fm = new FileMover(ffmpegInputStream, ffmpegPath.getAbsolutePath() + "/" + libraryAssets[i]);
-                fm.moveIt();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            String[] args = { "/system/bin/chmod", "755", ffmpegPath.getAbsolutePath() + "/ffmpeg" };
-            Process process = new ProcessBuilder(args).start();
-            try {
-                process.waitFor();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            process.destroy();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        mFFmpegPath = ffmpegPath;
     }
 
     /**
@@ -91,7 +66,7 @@ public class FFmpegExecuter {
      */
     public void init() {
         mCommands.clear();
-        mCommands.add(mContext.getFilesDir().toString() + "/" + FFMPEG_PATH + "/ffmpeg");
+        mCommands.add(mFFmpegPath);
     }
 
     /**
@@ -146,32 +121,5 @@ public class FFmpegExecuter {
 
     public interface OnReadProcessLineListener {
         public abstract void onReadProcessLine(String line);
-    }
-
-    // Copy file
-    private class FileMover {
-
-        private InputStream mInputStream;
-        private String mDestination;
-
-        public FileMover(InputStream inputStream, String destination) {
-            mInputStream = inputStream;
-            mDestination = destination;
-        }
-
-        public void moveIt() throws IOException {
-
-            File destinationFile = new File(mDestination);
-            OutputStream destinationOut = new BufferedOutputStream(new FileOutputStream(destinationFile));
-
-            int numRead;
-            byte[] buf = new byte[1024];
-            while ((numRead = mInputStream.read(buf) ) >= 0) {
-                destinationOut.write(buf, 0, numRead);
-            }
-
-            destinationOut.flush();
-            destinationOut.close();
-        }
     }
 }
