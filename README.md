@@ -21,6 +21,8 @@ mExecuter.setOnReadProcessLineListener(new FFmpegExecuter.OnReadProcessLineListe
 you must call init() before put command<br/>
 put some commands
 ```java
+mExecuter = new FFmpegExecuter(getApplicationContext(), ffmpegPath);
+
 mExecuter.init();
 
 mExecuter.putCommand("-y")
