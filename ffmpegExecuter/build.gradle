@@ -1,4 +1,16 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
+
+publish {
+    userOrg = 'mabi87'
+    groupId = 'com.crust87'
+    artifactId = 'ffmpeg-executer'
+    publishVersion = '1.0.0'
+    desc = 'FFmpeg binary executer for Android'
+    website = 'https://github.com/mabi87/Android-FFmpegExecuter'
+    issueTracker = "${website}/issues"
+    repository = "${website}.git"
+}
 
 android {
     compileSdkVersion 23
