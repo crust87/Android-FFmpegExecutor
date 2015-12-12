@@ -4,6 +4,12 @@ simple ffmpeg command executer for android
 Something wrong on this project....sample application module is bigger than library module. i will split app modul.
 
 ## Example
+
+add build.gradle<br />
+``` groovy
+compile 'com.crust87:ffmpeg-executer:1.0.0'
+```
+
 ```java
 mExecuter = new FFmpegExecuter(getApplicationContext());
 ```
