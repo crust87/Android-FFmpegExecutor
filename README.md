@@ -1,22 +1,21 @@
-# Android-FFmpegExecuter
-simple ffmpeg command executer for android
-
-Something wrong on this project....sample application module is bigger than library module. i will split app modul.
+# Android-FFmpegExecutor
+simple ffmpeg command executor for android
 
 ## Example
 
 add build.gradle<br />
 ``` groovy
-compile 'com.crust87:ffmpeg-executer:1.0.0'
+// compile 'com.crust87:ffmpeg-executor:1.0.1'
+// not yet
 ```
 
 ```java
-mExecuter = new FFmpegExecuter(getApplicationContext());
+mExecutor = new FFmpegExecutor(getApplicationContext());
 ```
 
 if you want to know ffmpeg log while process running, set this listener 
 ```java
-mExecuter.setOnReadProcessLineListener(new FFmpegExecuter.OnReadProcessLineListener() {
+mExecutor.setOnReadProcessLineListener(new FFmpegExecutor.OnReadProcessLineListener() {
     @Override
     public void onReadProcessLine(String line) {
         // TODO something
@@ -27,11 +26,11 @@ mExecuter.setOnReadProcessLineListener(new FFmpegExecuter.OnReadProcessLineListe
 you must call init() before put command<br/>
 put some commands
 ```java
-mExecuter = new FFmpegExecuter(getApplicationContext(), ffmpegPath);
+mExecutor = new FFmpegExecutor(getApplicationContext(), ffmpegPath);
 
-mExecuter.init();
+mExecutor.init();
 
-mExecuter.putCommand("-y")
+mExecutor.putCommand("-y")
     .putCommand("-i")
     .putCommand(originalPath)
     .putCommand("-vcodec")
@@ -51,7 +50,7 @@ mExecuter.putCommand("-y")
 
 and execute command
 ```java
-mExecuter.executeCommand();
+mExecutor.executeCommand();
 ```
 
 ## Licence

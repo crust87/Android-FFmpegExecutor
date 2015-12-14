@@ -10,14 +10,14 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/ffmpegExecuter" />
+            <option value="$PROJECT_DIR$/ffmpegExecutor" />
           </set>
         </option>
         <option name="myModules">
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/ffmpegExecuter" />
+            <option value="$PROJECT_DIR$/ffmpegExecutor" />
           </set>
         </option>
       </GradleProjectSettings>

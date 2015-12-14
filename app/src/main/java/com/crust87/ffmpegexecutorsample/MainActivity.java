@@ -1,6 +1,6 @@
 /*
- * HttpRequestBuilder
- * https://github.com/mabi87/Android-FFmpegExecuter
+ * Android-FFmpegExecutor
+ * https://github.com/crust87/Android-FFmpegExecutor
  *
  * Mabi
  * crust87@gmail.com
@@ -19,7 +19,7 @@
  * limitations under the License.
  */
 
-package com.mabi87.ffmpegexecutersample;
+package com.crust87.ffmpegexecutorsample;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -35,7 +35,8 @@ import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 
-import com.mabi87.videocropview.VideoCropView;
+import com.crust87.ffmpegexecutor.FFmpegExecutor;
+import com.crust87.videocropview.VideoCropView;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -55,7 +56,7 @@ public class MainActivity extends ActionBarActivity {
     private ProgressDialog mProgressDialog;
 
     // Component
-    private FFmpegExecuter mExecuter;
+    private FFmpegExecutor mExecutor;
 
     // Attributes
     private String originalPath;
@@ -94,7 +95,7 @@ public class MainActivity extends ActionBarActivity {
             e.printStackTrace();
         }
 
-        mExecuter = new FFmpegExecuter(getApplicationContext(), ffmpegDirPath.getAbsolutePath() + "/ffmpeg");
+        mExecutor = new FFmpegExecutor(getApplicationContext(), ffmpegDirPath.getAbsolutePath() + "/ffmpeg");
 
         mVideoCropView = (VideoCropView) findViewById(R.id.cropVideoView);
         mVideoCropView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -105,7 +106,7 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        mExecuter.setOnReadProcessLineListener(new FFmpegExecuter.OnReadProcessLineListener() {
+        mExecutor.setOnReadProcessLineListener(new FFmpegExecutor.OnReadProcessLineListener() {
             @Override
             public void onReadProcessLine(String line) {
                 Message message = Message.obtain();
@@ -160,7 +161,7 @@ public class MainActivity extends ActionBarActivity {
 
             @Override
             protected void onPreExecute() {
-                mExecuter.init();
+                mExecutor.init();
                 mProgressDialog = ProgressDialog.show(MainActivity.this, null, "execute....", true);
 
                 scale = mVideoCropView.getScale();
@@ -192,7 +193,7 @@ public class MainActivity extends ActionBarActivity {
                         filter = "crop="+width+":"+height+":"+positionX+":"+positionY+", scale=640:640, setsar=1:1";
                     }
 
-                    mExecuter.putCommand("-y")
+                    mExecutor.putCommand("-y")
                         .putCommand("-i")
                         .putCommand(originalPath)
                         .putCommand("-vcodec")

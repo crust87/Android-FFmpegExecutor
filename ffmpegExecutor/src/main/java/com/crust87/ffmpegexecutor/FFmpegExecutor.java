@@ -1,6 +1,6 @@
 /*
- * HttpRequestBuilder
- * https://github.com/mabi87/Android-FFmpegExecuter
+ * Android-FFmpegExecutor
+ * https://github.com/crust87/Android-FFmpegExecutor
  *
  * Mabi
  * crust87@gmail.com
@@ -19,22 +19,17 @@
  * limitations under the License.
  */
 
-package com.mabi87.ffmpegexecutersample;
+package com.crust87.ffmpegexecutor;
 
 import android.content.Context;
 import android.util.Log;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.util.ArrayList;
 
-public class FFmpegExecuter {
+public class FFmpegExecutor {
 
     // Components
     private Context mContext;
@@ -54,7 +49,7 @@ public class FFmpegExecuter {
      * @param ffmpegPath
      *              the String of ffmpegPath, this path must be internal storage
      */
-    public FFmpegExecuter(Context context, String ffmpegPath) {
+    public FFmpegExecutor(Context context, String ffmpegPath) {
         mContext = context;
         mCommands = new ArrayList<>();
 
@@ -74,7 +69,7 @@ public class FFmpegExecuter {
      * 				the string command for FFmpeg
      * @return this
      */
-    public FFmpegExecuter putCommand(String command) {
+    public FFmpegExecutor putCommand(String command) {
         mCommands.add(command);
 
         return this;
@@ -93,7 +88,7 @@ public class FFmpegExecuter {
             if(mOnReadProcessLineListener != null) {
                 mOnReadProcessLineListener.onReadProcessLine(line);
             } else {
-                Log.v("FFmpegExecuter", line);
+                Log.v("FFmpegExecutor", line);
             }
         }
 

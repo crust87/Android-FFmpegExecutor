@@ -4,10 +4,10 @@ apply plugin: 'com.novoda.bintray-release'
 publish {
     userOrg = 'mabi87'
     groupId = 'com.crust87'
-    artifactId = 'ffmpeg-executer'
-    publishVersion = '1.0.0'
-    desc = 'FFmpeg binary executer for Android'
-    website = 'https://github.com/mabi87/Android-FFmpegExecuter'
+    artifactId = 'ffmpeg-executor'
+    publishVersion = '1.0.1'
+    desc = 'FFmpeg binary executor for Android'
+    website = 'https://github.com/crust87/Android-FFmpegExecutor'
     issueTracker = "${website}/issues"
     repository = "${website}.git"
 }
@@ -18,9 +18,9 @@ android {
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 22
-        versionCode 1
-        versionName "1.0"
+        targetSdkVersion 23
+        versionCode 2
+        versionName "1.0.1"
     }
     buildTypes {
         release {
