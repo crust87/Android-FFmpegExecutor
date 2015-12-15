@@ -1,16 +1,45 @@
 # Android-FFmpegExecutor
 simple ffmpeg command executor for android
 
+## Update
+ffmpeg binary has moved to app<br />
+ffmpeg binary must be copy into internal storage
+
 ## Example
 
 add build.gradle<br />
 ``` groovy
-// compile 'com.crust87:ffmpeg-executor:1.0.1'
-// not yet
+compile 'com.crust87:ffmpeg-executor:1.0.1'
 ```
 
 ```java
-mExecutor = new FFmpegExecutor(getApplicationContext());
+File ffmpegDirPath = new File(getApplicationContext().getFilesDir().getAbsolutePath() + "/ffmpeg");
+if(!ffmpegDirPath.exists()) {
+    ffmpegDirPath.mkdir();
+}
+
+try {
+    InputStream ffmpegInputStream = getApplicationContext().getAssets().open("ffmpeg");
+    FileMover fm = new FileMover(ffmpegInputStream, ffmpegDirPath.getAbsolutePath() + "/ffmpeg");
+    fm.moveIt();
+} catch (IOException e) {
+    e.printStackTrace();
+}
+
+try {
+    String[] args = { "/system/bin/chmod", "755", ffmpegDirPath.getAbsolutePath() + "/ffmpeg" };
+    Process process = new ProcessBuilder(args).start();
+    try {
+        process.waitFor();
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+    process.destroy();
+} catch (IOException e) {
+    e.printStackTrace();
+}
+
+mExecutor = new FFmpegExecutor(getApplicationContext(), ffmpegDirPath.getAbsolutePath() + "/ffmpeg");
 ```
 
 if you want to know ffmpeg log while process running, set this listener 

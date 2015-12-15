@@ -48,9 +48,6 @@ import java.io.OutputStream;
 
 public class MainActivity extends ActionBarActivity {
 
-    // Constants
-    private final static String FFMPEG_PATH = "ffmpeg";
-
     // Layout Components
     private VideoCropView mVideoCropView;
     private ProgressDialog mProgressDialog;
@@ -65,21 +62,17 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String[] libraryAssets = { "ffmpeg" };
-
-        File ffmpegDirPath = new File(getApplicationContext().getFilesDir().getAbsolutePath() + "/" + FFMPEG_PATH);
+        File ffmpegDirPath = new File(getApplicationContext().getFilesDir().getAbsolutePath() + "/ffmpeg");
         if(!ffmpegDirPath.exists()) {
             ffmpegDirPath.mkdir();
         }
 
-        for (int i = 0; i < libraryAssets.length; i++) {
-            try {
-                InputStream ffmpegInputStream = getApplicationContext().getAssets().open(libraryAssets[i]);
-                FileMover fm = new FileMover(ffmpegInputStream, ffmpegDirPath.getAbsolutePath() + "/" + libraryAssets[i]);
-                fm.moveIt();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            InputStream ffmpegInputStream = getApplicationContext().getAssets().open("ffmpeg");
+            FileMover fm = new FileMover(ffmpegInputStream, ffmpegDirPath.getAbsolutePath() + "/ffmpeg");
+            fm.moveIt();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         try {
