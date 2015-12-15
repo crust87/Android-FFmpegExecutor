@@ -3,7 +3,7 @@ simple ffmpeg command executor for android
 
 ## Update
 ffmpeg binary has moved to app<br />
-ffmpeg binary must be copy into internal storage
+ffmpeg binary must be copied into internal storage
 
 ## Example
 
