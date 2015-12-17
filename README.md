@@ -1,5 +1,7 @@
 # Android-FFmpegExecutor
-simple ffmpeg command executor for android
+simple ffmpeg command executor for android<br /><br /><br />
+
+ffmpeg binary in this project comes from "https://github.com/WritingMinds/ffmpeg-android-java"
 
 ## Update
 ffmpeg binary has moved to app<br />
