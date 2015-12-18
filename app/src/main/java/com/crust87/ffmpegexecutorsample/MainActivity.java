@@ -122,6 +122,10 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void onButtonCropClick(View v) {
+        if(originalPath == null) {
+            return;
+        }
+
         mVideoCropView.pause();
 
         new AsyncTask<Void, Void, Void>() {

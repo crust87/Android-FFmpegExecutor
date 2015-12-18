@@ -5,14 +5,21 @@ ffmpeg binary in this project comes from<br />
 https://github.com/WritingMinds/ffmpeg-android-java
 
 ## Update
+### 1.0.1
 ffmpeg binary has moved to app<br />
 ffmpeg binary must be copied into internal storage
+
+### 1.1.0
+add constructor with InputStream
+
+### 1.1.3
+check if ffmpeg file has already copied
 
 ## Example
 
 add build.gradle<br />
 ``` groovy
-compile 'com.crust87:ffmpeg-executor:1.1.0'
+compile 'com.crust87:ffmpeg-executor:1.1.3'
 ```
 
 ```java

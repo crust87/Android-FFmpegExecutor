@@ -82,8 +82,11 @@ public class FFmpegExecutor {
 
         mFFmpegPath = ffmpegDirPath.getAbsolutePath() + "/ffmpeg";
 
-        FileMover fileMover = new FileMover(ffmpegInputStream, mFFmpegPath);
-        fileMover.moveIt();
+        File ffmpeg = new File(mFFmpegPath);
+        if(!ffmpeg.exists()) {
+            FileMover fileMover = new FileMover(ffmpegInputStream, ffmpeg);
+            fileMover.moveIt();
+        }
 
         String[] args = { "/system/bin/chmod", "755", mFFmpegPath };
         Process process = new ProcessBuilder(args).start();

@@ -12,17 +12,15 @@ import java.io.OutputStream;
  */
 public class FileMover {
     private InputStream mInputStream;
-    private String mDestination;
+    private File mDestination;
 
-    public FileMover(InputStream inputStream, String destination) {
+    public FileMover(InputStream inputStream, File destination) {
         mInputStream = inputStream;
         mDestination = destination;
     }
 
     public void moveIt() throws IOException {
-
-        File destinationFile = new File(mDestination);
-        OutputStream destinationOut = new BufferedOutputStream(new FileOutputStream(destinationFile));
+        OutputStream destinationOut = new BufferedOutputStream(new FileOutputStream(mDestination));
 
         int numRead;
         byte[] buf = new byte[1024];
