@@ -75,7 +75,7 @@ mExecutor.executeCommand();
 
 ## Documents
 ### Java
-| Public Methods |
+| Public Constructors |
 |:---|
 | FFmpegExecutor(Context context, String ffmpegPath) |
 | FFmpegExecutor(Context context, InputStream ffmpegInputStream) |
