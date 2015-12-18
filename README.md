@@ -81,6 +81,7 @@ mExecutor.executeCommand();
 | FFmpegExecutor(Context context, InputStream ffmpegInputStream) |
 
 ### Public Methods
+| | |
 |:---|:---|
 | void | init()<br />Reset FFmpeg command |
 | FFmpegExecuter | putCommand(String command)<br />Add ffmpeg command, It can be Method chaining |
