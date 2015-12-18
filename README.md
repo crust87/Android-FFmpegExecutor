@@ -75,13 +75,12 @@ mExecutor.executeCommand();
 
 ## Documents
 ### Java
-| Method Name | Parameters | Return | Description |
-|:---|:---|:---|:---|
-| init | | | Reset command |
-| putCommand | String command | FFmpegExecuter | Add ffmpeg command, It can be Method chaining |
-| executeCommand | | | Execute FFmpeg with added command, this method throws IOException |
-| destroy | | | Destroy FFmpeg process, not tested |
-| setOnReadProcess-<br />LineListener | OnReadProcess-<br />LineListener | | Add listener lesten read line from FFmpeg process |
+|:---|:---|
+| void | init()<br />Reset FFmpeg command |
+| FFmpegExecuter | putCommand(String command)<br />Add ffmpeg command, It can be Method chaining |
+| void | executeCommand()<br />Execute FFmpeg with added command, this method throws IOException |
+| void | destroy()<br /> Destroy FFmpeg process, not tested |
+| void | setOnReadProcessLineListener(OnReadProcessLineListener pOnReadProcessLineListener)<br />Add listener lesten read line from FFmpeg process |
 
 
 ## Licence
