@@ -12,37 +12,18 @@ ffmpeg binary must be copied into internal storage
 
 add build.gradle<br />
 ``` groovy
-compile 'com.crust87:ffmpeg-executor:1.0.1'
+compile 'com.crust87:ffmpeg-executor:1.1.0'
 ```
 
 ```java
-File ffmpegDirPath = new File(getApplicationContext().getFilesDir().getAbsolutePath() + "/ffmpeg");
-if(!ffmpegDirPath.exists()) {
-    ffmpegDirPath.mkdir();
-}
-
 try {
-    InputStream ffmpegInputStream = getApplicationContext().getAssets().open("ffmpeg");
-    FileMover fm = new FileMover(ffmpegInputStream, ffmpegDirPath.getAbsolutePath() + "/ffmpeg");
-    fm.moveIt();
+    InputStream ffmpegFileStream = getApplicationContext().getAssets().open("ffmpeg");
+    mExecutor = new FFmpegExecutor(getApplicationContext(), ffmpegFileStream);
 } catch (IOException e) {
-    e.printStackTrace();
+    // TODO something
+} catch (InterruptedException e) {
+    // TODO something
 }
-
-try {
-    String[] args = { "/system/bin/chmod", "755", ffmpegDirPath.getAbsolutePath() + "/ffmpeg" };
-    Process process = new ProcessBuilder(args).start();
-    try {
-        process.waitFor();
-    } catch (InterruptedException e) {
-        e.printStackTrace();
-    }
-    process.destroy();
-} catch (IOException e) {
-    e.printStackTrace();
-}
-
-mExecutor = new FFmpegExecutor(getApplicationContext(), ffmpegDirPath.getAbsolutePath() + "/ffmpeg");
 ```
 
 if you want to know ffmpeg log while process running, set this listener 

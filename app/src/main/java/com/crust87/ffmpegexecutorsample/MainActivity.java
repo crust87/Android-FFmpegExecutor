@@ -34,16 +34,13 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
+import android.widget.Toast;
 
 import com.crust87.ffmpegexecutor.FFmpegExecutor;
 import com.crust87.videocropview.VideoCropView;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -60,37 +57,25 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        try {
+            InputStream ffmpegFileStream = getApplicationContext().getAssets().open("ffmpeg");
+            mExecutor = new FFmpegExecutor(getApplicationContext(), ffmpegFileStream);
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "Fail FFmpeg Setting", Toast.LENGTH_LONG).show();
+            finish();
+        }
+
+        loadGUI();
+        bindEvent();
+    }
+
+    private void loadGUI() {
         setContentView(R.layout.activity_main);
-
-        File ffmpegDirPath = new File(getApplicationContext().getFilesDir().getAbsolutePath() + "/ffmpeg");
-        if(!ffmpegDirPath.exists()) {
-            ffmpegDirPath.mkdir();
-        }
-
-        try {
-            InputStream ffmpegInputStream = getApplicationContext().getAssets().open("ffmpeg");
-            FileMover fm = new FileMover(ffmpegInputStream, ffmpegDirPath.getAbsolutePath() + "/ffmpeg");
-            fm.moveIt();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            String[] args = { "/system/bin/chmod", "755", ffmpegDirPath.getAbsolutePath() + "/ffmpeg" };
-            Process process = new ProcessBuilder(args).start();
-            try {
-                process.waitFor();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            process.destroy();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        mExecutor = new FFmpegExecutor(getApplicationContext(), ffmpegDirPath.getAbsolutePath() + "/ffmpeg");
-
         mVideoCropView = (VideoCropView) findViewById(R.id.cropVideoView);
+    }
+
+    private void bindEvent() {
         mVideoCropView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
             @Override
@@ -239,33 +224,6 @@ public class MainActivity extends ActionBarActivity {
             if (cursor != null) {
                 cursor.close();
             }
-        }
-    }
-
-    // Copy file
-    private class FileMover {
-
-        private InputStream mInputStream;
-        private String mDestination;
-
-        public FileMover(InputStream inputStream, String destination) {
-            mInputStream = inputStream;
-            mDestination = destination;
-        }
-
-        public void moveIt() throws IOException {
-
-            File destinationFile = new File(mDestination);
-            OutputStream destinationOut = new BufferedOutputStream(new FileOutputStream(destinationFile));
-
-            int numRead;
-            byte[] buf = new byte[1024];
-            while ((numRead = mInputStream.read(buf) ) >= 0) {
-                destinationOut.write(buf, 0, numRead);
-            }
-
-            destinationOut.flush();
-            destinationOut.close();
         }
     }
 }

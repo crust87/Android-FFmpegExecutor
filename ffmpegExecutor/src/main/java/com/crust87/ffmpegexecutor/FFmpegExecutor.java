@@ -25,7 +25,9 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
@@ -54,6 +56,39 @@ public class FFmpegExecutor {
         mCommands = new ArrayList<>();
 
         mFFmpegPath = ffmpegPath;
+    }
+
+    /**
+     * Constructor
+     * Copy ffmpeg to internal storage and change file permission
+     *
+     * @param context
+     * 				the context of application
+     * @param ffmpegInputStream
+     *              the InputStream of ffmpeg binary
+     * @throws IOException
+     *              Exception for copy binary to internal storage
+     * @throws InterruptedException
+     *              Exception for change permission ffmpeg directory
+     */
+    public FFmpegExecutor(Context context, InputStream ffmpegInputStream) throws IOException, InterruptedException {
+        mContext = context;
+        mCommands = new ArrayList<>();
+
+        File ffmpegDirPath = new File(mContext.getFilesDir().getAbsolutePath() + "/ffmpeg");
+        if(!ffmpegDirPath.exists()) {
+            ffmpegDirPath.mkdir();
+        }
+
+        mFFmpegPath = ffmpegDirPath.getAbsolutePath() + "/ffmpeg";
+
+        FileMover fileMover = new FileMover(ffmpegInputStream, mFFmpegPath);
+        fileMover.moveIt();
+
+        String[] args = { "/system/bin/chmod", "755", mFFmpegPath };
+        Process process = new ProcessBuilder(args).start();
+        process.waitFor();
+        process.destroy();
     }
 
     /**
