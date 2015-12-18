@@ -75,6 +75,12 @@ mExecutor.executeCommand();
 
 ## Documents
 ### Java
+| Public Methods |
+|:---|
+| FFmpegExecutor(Context context, String ffmpegPath) |
+| FFmpegExecutor(Context context, InputStream ffmpegInputStream) |
+
+
 | Public Methods | |
 |:---|:---|
 | void | init()<br />Reset FFmpeg command |
