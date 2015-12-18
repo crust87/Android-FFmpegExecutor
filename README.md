@@ -73,6 +73,17 @@ and execute command
 mExecutor.executeCommand();
 ```
 
+## Documents
+### Java
+| Method Name | Parameters | Return | Description |
+|:---|:---|:---|:---|
+| init | | | Reset command |
+| putCommand | String command | FFmpegExecuter | Add ffmpeg command, It can be Method chaining |
+| executeCommand | | | Execute FFmpeg with added command, this method throws IOException |
+| destroy | | | Destroy FFmpeg process, not tested |
+| setOnReadProcess-<br />LineListener | OnReadProcess-<br />LineListener | | Add listener lesten read line from FFmpeg process |
+
+
 ## Licence
 Copyright 2015 Mabi
 
