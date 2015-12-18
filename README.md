@@ -75,10 +75,10 @@ mExecutor.executeCommand();
 
 ## Summary
 ### Public Constructors
-| | |
-|:---|:---|
-| | FFmpegExecutor(Context context, String ffmpegPath) |
-| | FFmpegExecutor(Context context, InputStream ffmpegInputStream) |
+| |
+|:---|
+| FFmpegExecutor(Context context, String ffmpegPath) |
+| FFmpegExecutor(Context context, InputStream ffmpegInputStream) |
 
 ### Public Methods
 | | |
