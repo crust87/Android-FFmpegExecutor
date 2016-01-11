@@ -22,6 +22,7 @@
 package com.crust87.ffmpegexecutor;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -36,8 +37,9 @@ public class FFmpegExecutor {
     // Components
     private Context mContext;
     private ArrayList<String> mCommands;
-    private OnReadProcessLineListener mOnReadProcessLineListener;
     private Process mCurrentProcess;
+    private FFmepgExecuteListener mFFmepgExecuteListener;
+    private Handler mHandler;
 
     // Attributes
     private String mFFmpegPath;
@@ -55,6 +57,7 @@ public class FFmpegExecutor {
         mContext = context;
         mCommands = new ArrayList<>();
 
+        mHandler = new Handler();
         mFFmpegPath = ffmpegPath;
     }
 
@@ -118,20 +121,42 @@ public class FFmpegExecutor {
      * 				if Process can not start
      */
     public void executeCommand() throws IOException {
+        mHandler.post(mPreExecuteRunnable);
+
         mCurrentProcess = new ProcessBuilder(mCommands).redirectErrorStream(true).start();
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(mCurrentProcess.getInputStream()));
         String line;
         while ((line = reader.readLine()) != null)  {
-            if(mOnReadProcessLineListener != null) {
-                mOnReadProcessLineListener.onReadProcessLine(line);
+            if(mFFmepgExecuteListener != null) {
+                mFFmepgExecuteListener.onReadProcessLine(line);
             } else {
                 Log.v("FFmpegExecutor", line);
             }
         }
 
         destroy();
+
+        mHandler.post(mPostExecuteRunnable);
     }
+
+    private Runnable mPreExecuteRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if(mFFmepgExecuteListener != null) {
+                mFFmepgExecuteListener.onStartExecute();
+            }
+        }
+    };
+
+    private Runnable mPostExecuteRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if(mFFmepgExecuteListener != null) {
+                mFFmepgExecuteListener.onFinishExecute();
+            }
+        }
+    };
 
     /*
      * I'm not sure it's work
@@ -143,16 +168,13 @@ public class FFmpegExecutor {
         }
     }
 
-    /**
-     * @param pOnReadProcessLineListener
-     * 				the OnReadProcessLineListener for ffmpegLog()
-     * 			    if you set this interface, ffmpegLog method will use it when read each line
-     */
-    public void setOnReadProcessLineListener(OnReadProcessLineListener pOnReadProcessLineListener) {
-        mOnReadProcessLineListener = pOnReadProcessLineListener;
+    public void setFFmepgExecuteListener(FFmepgExecuteListener ffmepgExecuteListener) {
+        mFFmepgExecuteListener = ffmepgExecuteListener;
     }
 
-    public interface OnReadProcessLineListener {
-        public abstract void onReadProcessLine(String line);
+    public interface FFmepgExecuteListener {
+        void onStartExecute();
+        void onReadProcessLine(String line);
+        void onFinishExecute();
     }
 }

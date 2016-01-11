@@ -84,13 +84,27 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        mExecutor.setOnReadProcessLineListener(new FFmpegExecutor.OnReadProcessLineListener() {
+        mExecutor.setFFmepgExecuteListener(new FFmpegExecutor.FFmepgExecuteListener() {
+
+            @Override
+            public void onStartExecute() {
+
+            }
+
             @Override
             public void onReadProcessLine(String line) {
                 Message message = Message.obtain();
                 message.obj = line;
                 message.setTarget(mMessageHandler);
                 message.sendToTarget();
+            }
+
+            @Override
+            public void onFinishExecute() {
+                if(mProgressDialog != null) {
+                    mProgressDialog.dismiss();
+                    mProgressDialog = null;
+                }
             }
         });
     }
@@ -198,13 +212,6 @@ public class MainActivity extends ActionBarActivity {
 
                 return null;
             }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                mProgressDialog.dismiss();
-                mProgressDialog = null;
-            }
-
         }.execute();
     }
 
