@@ -88,7 +88,7 @@ public class MainActivity extends ActionBarActivity {
 
             @Override
             public void onStartExecute() {
-
+                Toast.makeText(getApplicationContext(), "Start FFmpeg Process", Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -101,6 +101,8 @@ public class MainActivity extends ActionBarActivity {
 
             @Override
             public void onFinishExecute() {
+                Toast.makeText(getApplicationContext(), "Finish FFmpeg Process", Toast.LENGTH_LONG).show();
+
                 if(mProgressDialog != null) {
                     mProgressDialog.dismiss();
                     mProgressDialog = null;
@@ -142,77 +144,62 @@ public class MainActivity extends ActionBarActivity {
 
         mVideoCropView.pause();
 
-        new AsyncTask<Void, Void, Void>() {
+        float scale;
+        int viewWidth;
+        int viewHeight;
+        int width;
+        int height;
+        int positionX;
+        int positionY;
+        int videoWidth;
+        int videoHeight;
+        int rotate;
 
-            float scale;
-            int viewWidth;
-            int viewHeight;
-            int width;
-            int height;
-            int positionX;
-            int positionY;
-            int videoWidth;
-            int videoHeight;
-            int rotate;
+        mExecutor.init();
+        mProgressDialog = ProgressDialog.show(MainActivity.this, null, "execute....", true);
 
-            @Override
-            protected void onPreExecute() {
-                mExecutor.init();
-                mProgressDialog = ProgressDialog.show(MainActivity.this, null, "execute....", true);
+        scale = mVideoCropView.getScale();
+        viewWidth = mVideoCropView.getWidth();
+        viewHeight = mVideoCropView.getHeight();
+        width = (int)(viewWidth * scale);
+        height = (int)(viewHeight * scale);
+        positionX = (int) mVideoCropView.getRealPositionX();
+        positionY = (int) mVideoCropView.getRealPositionY();
+        videoWidth = mVideoCropView.getVideoWidth();
+        videoHeight = mVideoCropView.getVideoHeight();
+        rotate = mVideoCropView.getRotate();
 
-                scale = mVideoCropView.getScale();
-                viewWidth = mVideoCropView.getWidth();
-                viewHeight = mVideoCropView.getHeight();
-                width = (int)(viewWidth * scale);
-                height = (int)(viewHeight * scale);
-                positionX = (int) mVideoCropView.getRealPositionX();
-                positionY = (int) mVideoCropView.getRealPositionY();
-                videoWidth = mVideoCropView.getVideoWidth();
-                videoHeight = mVideoCropView.getVideoHeight();
-                rotate = mVideoCropView.getRotate();
-            }
+        String filter = "";
 
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    String filter = "";
+        if(rotate == 0) {
+            filter = "crop="+width+":"+height+":"+positionX+":"+positionY+", scale=640:640, setsar=1:1";
+        } else if(rotate == 90) {
+            filter = "crop="+height+":"+width+":"+positionY+":"+positionX +", scale=640:640, setsar=1:1";
+        } else if(rotate == 180) {
+            filter = "crop="+width+":"+height+":"+(videoWidth - positionX - width)+":"+positionY+ ", scale=640:640, setsar=1:1";
+        } else if(rotate == 270) {
+            filter = "crop="+height+":"+width+":"+(videoHeight - positionY - height)+":"+positionX + ", scale=640:640, setsar=1:1";
+        } else {
+            filter = "crop="+width+":"+height+":"+positionX+":"+positionY+", scale=640:640, setsar=1:1";
+        }
 
-                    if(rotate == 0) {
-                        filter = "crop="+width+":"+height+":"+positionX+":"+positionY+", scale=640:640, setsar=1:1";
-                    } else if(rotate == 90) {
-                        filter = "crop="+height+":"+width+":"+positionY+":"+positionX +", scale=640:640, setsar=1:1";
-                    } else if(rotate == 180) {
-                        filter = "crop="+width+":"+height+":"+(videoWidth - positionX - width)+":"+positionY+ ", scale=640:640, setsar=1:1";
-                    } else if(rotate == 270) {
-                        filter = "crop="+height+":"+width+":"+(videoHeight - positionY - height)+":"+positionX + ", scale=640:640, setsar=1:1";
-                    } else {
-                        filter = "crop="+width+":"+height+":"+positionX+":"+positionY+", scale=640:640, setsar=1:1";
-                    }
-
-                    mExecutor.putCommand("-y")
-                        .putCommand("-i")
-                        .putCommand(originalPath)
-                        .putCommand("-vcodec")
-                        .putCommand("libx264")
-                        .putCommand("-profile:v")
-                        .putCommand("baseline")
-                        .putCommand("-level")
-                        .putCommand("3.1")
-                        .putCommand("-b:v")
-                        .putCommand("1000k")
-                        .putCommand("-vf")
-                        .putCommand(filter)
-                        .putCommand("-c:a")
-                        .putCommand("copy")
-                        .putCommand(Environment.getExternalStorageDirectory().getAbsolutePath() + "/result.mp4")
-                        .executeCommand();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                return null;
-            }
-        }.execute();
+        mExecutor.putCommand("-y")
+                .putCommand("-i")
+                .putCommand(originalPath)
+                .putCommand("-vcodec")
+                .putCommand("libx264")
+                .putCommand("-profile:v")
+                .putCommand("baseline")
+                .putCommand("-level")
+                .putCommand("3.1")
+                .putCommand("-b:v")
+                .putCommand("1000k")
+                .putCommand("-vf")
+                .putCommand(filter)
+                .putCommand("-c:a")
+                .putCommand("copy")
+                .putCommand(Environment.getExternalStorageDirectory().getAbsolutePath() + "/result.mp4")
+                .executeCommandAsync();
     }
 
     // Initialization original video

@@ -22,6 +22,7 @@
 package com.crust87.ffmpegexecutor;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 
@@ -83,6 +84,7 @@ public class FFmpegExecutor {
             ffmpegDirPath.mkdir();
         }
 
+        mHandler = new Handler();
         mFFmpegPath = ffmpegDirPath.getAbsolutePath() + "/ffmpeg";
 
         File ffmpeg = new File(mFFmpegPath);
@@ -116,13 +118,7 @@ public class FFmpegExecutor {
         return this;
     }
 
-    /**
-     * @throws IOException
-     * 				if Process can not start
-     */
-    public void executeCommand() throws IOException {
-        mHandler.post(mPreExecuteRunnable);
-
+    private void executeAndDestroy() throws IOException {
         mCurrentProcess = new ProcessBuilder(mCommands).redirectErrorStream(true).start();
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(mCurrentProcess.getInputStream()));
@@ -136,8 +132,44 @@ public class FFmpegExecutor {
         }
 
         destroy();
+    }
+
+    /**
+     * @throws IOException
+     * 				if Process can not start
+     */
+    public void executeCommand() throws IOException {
+        mHandler.post(mPreExecuteRunnable);
+
+        executeAndDestroy();
 
         mHandler.post(mPostExecuteRunnable);
+    }
+
+    public void executeCommandAsync() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected void onPreExecute() {
+                mHandler.post(mPreExecuteRunnable);
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    executeAndDestroy();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                mHandler.post(mPostExecuteRunnable);
+            }
+
+        }.execute();
     }
 
     private Runnable mPreExecuteRunnable = new Runnable() {
@@ -168,6 +200,10 @@ public class FFmpegExecutor {
         }
     }
 
+    /**
+     * @param ffmepgExecuteListener
+     * 				listener
+     */
     public void setFFmepgExecuteListener(FFmepgExecuteListener ffmepgExecuteListener) {
         mFFmepgExecuteListener = ffmepgExecuteListener;
     }
