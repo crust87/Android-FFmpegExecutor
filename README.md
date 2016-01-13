@@ -5,6 +5,9 @@ ffmpeg binary in this project comes from<br />
 https://github.com/WritingMinds/ffmpeg-android-java
 
 ## Update
+### 1.1.4
+add method executeCommandAsync
+
 ### 1.1.3
 check if ffmpeg file has already copied
 
@@ -19,7 +22,7 @@ ffmpeg binary must be copied into internal storage
 
 add build.gradle<br />
 ``` groovy
-compile 'com.crust87:ffmpeg-executor:1.1.3'
+compile 'com.crust87:ffmpeg-executor:1.1.4'
 ```
 
 ```java
@@ -33,12 +36,23 @@ try {
 }
 ```
 
-if you want to know ffmpeg log while process running, set this listener 
+if you want to know ffmpeg log while process running, set this listener
 ```java
-mExecutor.setOnReadProcessLineListener(new FFmpegExecutor.OnReadProcessLineListener() {
+mExecutor.setFFmepgExecuteListener(new FFmpegExecutor.FFmepgExecuteListener() {
+
+    @Override
+    public void onStartExecute() {
+        // TODO Something
+    }
+
     @Override
     public void onReadProcessLine(String line) {
-        // TODO something
+        // TODO Something
+    }
+
+    @Override
+    public void onFinishExecute() {
+        // TODO Something
     }
 });
 ```
@@ -70,7 +84,7 @@ mExecutor.putCommand("-y")
 
 and execute command
 ```java
-mExecutor.executeCommand();
+mExecutor.executeCommandAsync();
 ```
 
 ## Summary
@@ -86,6 +100,7 @@ mExecutor.executeCommand();
 | void | init()<br />Reset FFmpeg command |
 | FFmpegExecuter | putCommand(String command)<br />Add ffmpeg command, It can be Method chaining |
 | void | executeCommand()<br />Execute FFmpeg with added command, this method throws IOException |
+| void | executeCommandAsync()<br />Execute asynchronously FFmpeg with added command |
 | void | destroy()<br /> Destroy FFmpeg process, not tested |
 | void | setOnReadProcessLineListener(OnReadProcessLineListener pOnReadProcessLineListener)<br />Add listener lesten read line from FFmpeg process |
 
