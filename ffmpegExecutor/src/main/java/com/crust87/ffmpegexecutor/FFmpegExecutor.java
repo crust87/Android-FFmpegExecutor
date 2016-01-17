@@ -37,13 +37,18 @@ public class FFmpegExecutor {
 
     // Components
     private Context mContext;
-    private ArrayList<String> mCommands;
-    private Process mCurrentProcess;
-    private FFmepgExecuteListener mFFmepgExecuteListener;
     private Handler mHandler;
+    private ArrayList<String> mCommands;
+    private ArrayList<ProcessBuilder> mProcessQueue;
+
+    private FFmepgExecuteListener mFFmepgExecuteListener;
+    private FFmepgProcessListener mFFmepgProcessListener;
 
     // Attributes
     private String mFFmpegPath;
+
+    // Working Components
+    private Process mCurrentProcess;
 
     /**
      * Constructor
@@ -57,6 +62,7 @@ public class FFmpegExecutor {
     public FFmpegExecutor(Context context, String ffmpegPath) {
         mContext = context;
         mCommands = new ArrayList<>();
+        mProcessQueue = new ArrayList<>();
 
         mHandler = new Handler();
         mFFmpegPath = ffmpegPath;
@@ -105,6 +111,8 @@ public class FFmpegExecutor {
     public void init() {
         mCommands.clear();
         mCommands.add(mFFmpegPath);
+
+        mProcessQueue.clear();
     }
 
     /**
@@ -118,8 +126,70 @@ public class FFmpegExecutor {
         return this;
     }
 
-    private void executeAndDestroy() throws IOException {
-        mCurrentProcess = new ProcessBuilder(mCommands).redirectErrorStream(true).start();
+    private FFmpegExecutor addQueue() {
+        mProcessQueue.add(new ProcessBuilder(mCommands));
+
+        return this;
+    }
+
+    private FFmpegExecutor clearQueue() {
+        mProcessQueue.clear();
+
+        return this;
+    }
+
+    private void executeProcessQueue() throws IOException {
+        mHandler.post(mPreExecuteRunnable);
+
+        for(ProcessBuilder builder: mProcessQueue) {
+            mHandler.post(mPreProcessRunnable);
+            executeProcess(builder);
+            mHandler.post(mPostProcessRunnable);
+        }
+
+        mHandler.post(mPostExecuteRunnable);
+
+        mProcessQueue.clear();
+    }
+
+    private void executeProcessQueueAsync() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected void onPreExecute() {
+                onStartExecute();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    for(ProcessBuilder builder: mProcessQueue) {
+                        mHandler.post(mPreProcessRunnable);
+                        executeProcess(builder);
+                        mHandler.post(mPostProcessRunnable);
+                    }
+
+                    mProcessQueue.clear();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                onFinishExecute();
+            }
+
+        }.execute();
+    }
+
+    private void executeProcess() throws IOException {
+        executeProcess(new ProcessBuilder(mCommands));
+    }
+
+    private void executeProcess(ProcessBuilder builder) throws IOException {
+        mCurrentProcess = builder.redirectErrorStream(true).start();
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(mCurrentProcess.getInputStream()));
         String line;
@@ -141,7 +211,7 @@ public class FFmpegExecutor {
     public void executeCommand() throws IOException {
         mHandler.post(mPreExecuteRunnable);
 
-        executeAndDestroy();
+        executeProcess();
 
         mHandler.post(mPostExecuteRunnable);
     }
@@ -150,13 +220,13 @@ public class FFmpegExecutor {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected void onPreExecute() {
-                mHandler.post(mPreExecuteRunnable);
+                onStartExecute();
             }
 
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    executeAndDestroy();
+                    executeProcess();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -166,29 +236,63 @@ public class FFmpegExecutor {
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                mHandler.post(mPostExecuteRunnable);
+                onFinishExecute();
             }
 
         }.execute();
     }
 
+    private void onStartExecute() {
+        if(mFFmepgExecuteListener != null) {
+            mFFmepgExecuteListener.onStartExecute();
+        }
+    }
+
+    private void onFinishExecute() {
+        if(mFFmepgExecuteListener != null) {
+            mFFmepgExecuteListener.onFinishExecute();
+        }
+    }
+
     private Runnable mPreExecuteRunnable = new Runnable() {
         @Override
         public void run() {
-            if(mFFmepgExecuteListener != null) {
-                mFFmepgExecuteListener.onStartExecute();
-            }
+            onStartExecute();
         }
     };
 
     private Runnable mPostExecuteRunnable = new Runnable() {
         @Override
         public void run() {
-            if(mFFmepgExecuteListener != null) {
-                mFFmepgExecuteListener.onFinishExecute();
-            }
+            onFinishExecute();
         }
     };
+
+    private void onStartProcess() {
+        if(mFFmepgProcessListener != null) {
+            mFFmepgProcessListener.onStartProcess();
+        }
+    }
+
+    private void onFinishProcess() {
+        if(mFFmepgProcessListener != null) {
+            mFFmepgProcessListener.onFinishProcess();
+        }
+    }
+
+    private Runnable mPreProcessRunnable = new Runnable() {
+        @Override
+        public void run() {
+            onStartProcess();
+        }
+    };
+
+    private Runnable mPostProcessRunnable = new Runnable() {
+        @Override
+        public void run() {
+            onFinishProcess();
+        }
+    }
 
     /*
      * I'm not sure it's work
@@ -212,5 +316,14 @@ public class FFmpegExecutor {
         void onStartExecute();
         void onReadProcessLine(String line);
         void onFinishExecute();
+    }
+
+    private void setFFmepgProcessListener(FFmepgProcessListener ffmepgProcessListener) {
+        mFFmepgProcessListener = ffmepgProcessListener;
+    }
+
+    public interface FFmepgProcessListener {
+        void onStartProcess();
+        void onFinishProcess();
     }
 }
