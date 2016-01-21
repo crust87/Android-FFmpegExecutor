@@ -292,7 +292,7 @@ public class FFmpegExecutor {
         public void run() {
             onFinishProcess();
         }
-    }
+    };
 
     /*
      * I'm not sure it's work
@@ -325,5 +325,9 @@ public class FFmpegExecutor {
     public interface FFmepgProcessListener {
         void onStartProcess();
         void onFinishProcess();
+    }
+
+    public static String getArchitecture() {
+        return System.getProperty("os.arch");
     }
 }
