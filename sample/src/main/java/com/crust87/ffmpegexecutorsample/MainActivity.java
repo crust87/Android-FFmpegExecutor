@@ -4,7 +4,7 @@
  *
  * Mabi
  * crust87@gmail.com
- * last modify 2015-05-22
+ * last modify 2016-09-21
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,25 +26,22 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
 import com.crust87.ffmpegexecutor.FFmpegExecutor;
 import com.crust87.videocropview.VideoCropView;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
     // Layout Components
     private VideoCropView mVideoCropView;
@@ -85,12 +82,7 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        mExecutor.setFFmepgExecuteListener(new FFmpegExecutor.FFmepgExecuteListener() {
-
-            @Override
-            public void onStartExecute() {
-                Toast.makeText(getApplicationContext(), "Start FFmpeg Process", Toast.LENGTH_LONG).show();
-            }
+        mExecutor.setFFmepgExecutorListener(new FFmpegExecutor.FFmepgExecutorListener() {
 
             @Override
             public void onReadProcessLine(String line) {
@@ -101,28 +93,34 @@ public class MainActivity extends ActionBarActivity {
             }
 
             @Override
-            public void onFinishExecute() {
+            public void onFinishProcess() {
                 Toast.makeText(getApplicationContext(), "Finish FFmpeg Process", Toast.LENGTH_LONG).show();
 
-                if(mProgressDialog != null) {
+                if (mProgressDialog != null) {
                     mProgressDialog.dismiss();
                     mProgressDialog = null;
                 }
             }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
         });
     }
 
-    private Handler mMessageHandler = new Handler() {
+    private Handler mMessageHandler = new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-
+        public boolean handleMessage(Message msg) {
             String message = (String) msg.obj;
+
             if(mProgressDialog != null) {
                 mProgressDialog.setMessage(message);
             }
+
+            return true;
         }
-    };
+    });
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
