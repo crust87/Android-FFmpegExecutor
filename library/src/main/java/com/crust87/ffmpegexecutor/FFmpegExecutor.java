@@ -82,23 +82,6 @@ public class FFmpegExecutor {
      * Constructor
      * Copy ffmpeg to internal storage and change file permission
      *
-     * @param context    the context of application
-     * @param ffmpegPath the String of ffmpegPath, this path must be internal storage
-     */
-    public FFmpegExecutor(Context context, String ffmpegPath) {
-        mContext = context;
-        mCommands = new ArrayList<>();
-        mCommendQueue = new ArrayList<>();
-
-        mHandler = new Handler();
-        mFFmpegPath = ffmpegPath;
-        mExecutorState = ExecutorState.idle;
-    }
-
-    /**
-     * Constructor
-     * Copy ffmpeg to internal storage and change file permission
-     *
      * @param context           the context of application
      * @param ffmpegInputStream the InputStream of ffmpeg binary
      * @throws IOException          Exception for copy binary to internal storage
@@ -107,6 +90,7 @@ public class FFmpegExecutor {
     public FFmpegExecutor(Context context, InputStream ffmpegInputStream) throws IOException, InterruptedException {
         mContext = context;
         mCommands = new ArrayList<>();
+        mCommendQueue = new ArrayList<>();
 
         File ffmpegDirPath = new File(mContext.getFilesDir().getAbsolutePath() + "/ffmpeg");
         if (!ffmpegDirPath.exists()) {

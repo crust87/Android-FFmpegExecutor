@@ -31,13 +31,20 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.crust87.ffmpegexecutor.FFmpegExecutor;
+import com.crust87.ffmpegexecutor.FileMover;
 import com.crust87.videocropview.VideoCropView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 
@@ -70,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadGUI() {
         setContentView(R.layout.activity_main);
+
         mVideoCropView = (VideoCropView) findViewById(R.id.cropVideoView);
     }
 
@@ -86,7 +94,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onReadProcessLine(String line) {
+                Log.d("TEST", line);
+
                 Message message = Message.obtain();
+
                 message.obj = line;
                 message.setTarget(mMessageHandler);
                 message.sendToTarget();
