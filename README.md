@@ -4,7 +4,12 @@ simple ffmpeg command executor for android<br />
 ffmpeg binary in this project comes from<br />
 https://github.com/WritingMinds/ffmpeg-android-java
 
+Check permission before running test code!!!!
+
 ## Update
+### 1.3.0
+Update library
+
 ### 1.1.4
 add method executeCommandAsync
 
@@ -22,7 +27,7 @@ ffmpeg binary must be copied into internal storage
 
 add build.gradle<br />
 ``` groovy
-compile 'com.crust87:ffmpeg-executor:1.1.4'
+compile 'com.crust87:ffmpeg-executor:1.3.0'
 ```
 
 ```java
@@ -38,21 +43,21 @@ try {
 
 if you want to know ffmpeg log while process running, set this listener
 ```java
-mExecutor.setFFmepgExecuteListener(new FFmpegExecutor.FFmepgExecuteListener() {
-
-    @Override
-    public void onStartExecute() {
-        // TODO Something
-    }
+mExecutor.setFFmepgExecutorListener(new FFmpegExecutor.FFmepgExecutorListener() {
 
     @Override
     public void onReadProcessLine(String line) {
-        // TODO Something
+        // TODO Something to on read process line
     }
 
     @Override
-    public void onFinishExecute() {
-        // TODO Something
+    public void onFinishProcess() {
+        // TODO Something to finish job
+    }
+
+    @Override
+    public void onError(Exception e) {
+        // TODO Something for error from library
     }
 });
 ```
@@ -60,8 +65,6 @@ mExecutor.setFFmepgExecuteListener(new FFmpegExecutor.FFmepgExecuteListener() {
 you must call init() before put command<br/>
 put some commands
 ```java
-mExecutor = new FFmpegExecutor(getApplicationContext(), ffmpegPath);
-
 mExecutor.init();
 
 mExecutor.putCommand("-y")
@@ -91,7 +94,6 @@ mExecutor.executeCommandAsync();
 ### Public Constructors
 | |
 |:---|
-| FFmpegExecutor(Context context, String ffmpegPath) |
 | FFmpegExecutor(Context context, InputStream ffmpegInputStream) |
 
 ### Public Methods
@@ -102,8 +104,14 @@ mExecutor.executeCommandAsync();
 | void | executeCommand()<br />Execute FFmpeg with added command, this method throws IOException |
 | void | executeCommandAsync()<br />Execute asynchronously FFmpeg with added command |
 | void | destroy()<br /> Destroy FFmpeg process, not tested |
-| void | setOnReadProcessLineListener(OnReadProcessLineListener pOnReadProcessLineListener)<br />Add listener lesten read line from FFmpeg process |
+| void | setFFmepgExecutorListener(FFmepgExecutorListener l)<br />Add listener lesten read line from FFmpeg process |
 
+### Interface FFmepgExecutorListener
+| | |
+|:---|:---|
+| void | onReadProcessLine()<br /> |
+| void | onFinishProcess()<br /> |
+| void | onError(FFmepgExecutorListener l)<br /> |
 
 ## License
 Copyright 2015 Mabi

@@ -153,10 +153,8 @@ public class FFmpegExecutor {
      *
      * @return this
      */
-    private FFmpegExecutor clearQueue() {
+    private void clearQueue() {
         mCommendQueue.clear();
-
-        return this;
     }
 
     /**
@@ -164,7 +162,7 @@ public class FFmpegExecutor {
      *
      * @throws IOException
      */
-    private void executeProcessQueue() throws IOException {
+    public void executeProcessQueue() throws IOException {
         mExecutorState = ExecutorState.running;
 
         for (ProcessBuilder builder : mCommendQueue) {
@@ -179,7 +177,7 @@ public class FFmpegExecutor {
     /**
      * execute FFmpeg commends with process queue Async
      */
-    private void executeProcessQueueAsync() {
+    public void executeProcessQueueAsync() {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected void onPreExecute() {
